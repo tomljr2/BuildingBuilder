@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BuildingBuilder</string>
+    <string name="input_two_numbers_and_press_the_button">Input two numbers and press the button</string>
 </resources>
