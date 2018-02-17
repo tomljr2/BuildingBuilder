@@ -5,50 +5,72 @@
     android:layout_height="match_parent"
     tools:context="jandj.buildingbuilder.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/input_two_numbers_and_press_the_button"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/text"/>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/text"
-        android:id="@+id/inputs">
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:width="50dp"
-            android:id="@+id/et1"
-            android:text="1"/>
+        android:id="@+id/textLayout">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="x"/>
+            android:layout_marginLeft="10dp"
+            android:text="Enter a wall length:"
+            android:id="@+id/LengthTV"
+            android:layout_alignBaseline="@+id/Button"/>
 
         <EditText
+            android:id="@+id/LengthET"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:width="50dp"
-            android:id="@+id/et2"
-            android:text="1"/>
+            android:layout_alignBaseline="@+id/LengthTV"
+            android:layout_toEndOf="@+id/LengthTV"
+            android:layout_toLeftOf="@+id/spinner"
+            android:layout_toRightOf="@+id/LengthTV"
+            android:layout_toStartOf="@+id/spinner"
+            android:inputType="numberDecimal" />
 
-        <TextView
+        <Spinner
+            android:id="@+id/spinner"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/LengthTV"
+            android:layout_toLeftOf="@+id/Button"
+            android:layout_toStartOf="@+id/Button"
+            android:entries="@array/units" />
 
-    </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/Button"
+            android:layout_alignParentRight="true"
+            android:text="Enter"
+            android:layout_margin="10dp"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/inputs"
-        android:id="@+id/button"
-        android:text="test"
-        android:layout_centerHorizontal="true"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_below="@+id/Button"
+            android:layout_margin="20dp"/>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/textLayout"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/StudsTV"/>
+        </LinearLayout>
+    </ScrollView>
+
 
 </RelativeLayout>
