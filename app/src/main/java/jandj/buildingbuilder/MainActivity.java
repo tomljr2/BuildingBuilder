@@ -1,5 +1,4 @@
 package jandj.buildingbuilder;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     final int STUDDISTANCE = 16;
@@ -50,126 +48,91 @@ public class MainActivity extends AppCompatActivity {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    //If the text is red, an invalid number was inputted
-                    if(lengthTV.getCurrentTextColor() == Color.RED)
-                    {
-                        studsTV.setText("ERROR: Invalid number.");
-                    }
-                    //Easter egg just for funsies
-                    else if((Float.parseFloat(lengthET.getText().toString()) >= 44584350.3937
-                            && units.getSelectedItem().toString().equals("ft"))
-                            || (Float.parseFloat(lengthET.getText().toString()) >= 535012204.7243
-                            && units.getSelectedItem().toString().equals("in")))
-                    {
-                        studsTV.setText("ERROR: There is literally nowhere on Earth with that " +
-                                "much land to build on.");
-                    }
-                    //Set an upper limit to how long the wall can be. This prevents the app from
-                    //using all resources on your phone with really large numbers.
-                    else if((Float.parseFloat(lengthET.getText().toString()) > 1000.0
-                            && units.getSelectedItem().toString().equals("ft"))
-                            || (Float.parseFloat(lengthET.getText().toString()) > 12000.0
-                            && units.getSelectedItem().toString().equals("in")))
-                    {
-                        studsTV.setText("ERROR: Length too large.");
-                    }
-                    //The number cannot be smaller than 2 inches because we are assuming the
-                    //construction worker is using 2x4s
-                    else if ((units.getSelectedItem().toString().equals("in")
-                            && Float.parseFloat(lengthET.getText().toString()) < 2.0)
-                            || (units.getSelectedItem().toString().equals("ft")
-                            && Float.parseFloat(lengthET.getText().toString()) < (2.0/12.0)))
-                    {
-                        lengthTV.setTextColor(Color.RED);
-                        studsTV.setText("ERROR: Length too small.");
-                    }
-                    //If it is smaller than the width of two 2x4s, then we only want to use one.
-                    else if((units.getSelectedItem().toString().equals("in")
-                            && Float.parseFloat(lengthET.getText().toString()) < 4.0)
-                            || (units.getSelectedItem().toString().equals("ft")
-                            && Float.parseFloat(lengthET.getText().toString()) < (4.0/12.0)))
-                    {
-                        studsTV.setText("The center of stud 1 should be "
-                                + Float.parseFloat(lengthET.getText().toString())/2
-                                + " " + units.getSelectedItem().toString() + ". along the base.");
-                    }
-                    //Otherwise we will go through a loop to calculate and display every stud and its
-                    //position on the base piece of wood.
-                    else
-                    {
-                        String response = "";
-                        int studs = 0;
-                        float excess = 0;
-                        float currentPosition = 0;
-                        if(units.getSelectedItem().toString().equals("in"))
-                                studs = (int)(Float.parseFloat(lengthET.getText().toString())
-                                / STUDDISTANCE);
-                        else if(units.getSelectedItem().toString().equals("ft"))
-                            studs = (int)(Float.parseFloat(lengthET.getText().toString())
-                                    / (STUDDISTANCE/12.0));
 
-                        if(units.getSelectedItem().toString().equals("in"))
-                            excess = (int)(Float.parseFloat(lengthET.getText().toString())
-                                    % STUDDISTANCE);
-                        else if(units.getSelectedItem().toString().equals("ft"))
-                            excess = (int)(Float.parseFloat(lengthET.getText().toString())
-                                    % (STUDDISTANCE/12.0));
+                Float length = 0f;
 
-                        if(Float.parseFloat(lengthET.getText().toString()) % STUDDISTANCE != 0
-                                && units.getSelectedItem().toString().equals("in"))
-                            studs++;
-                        else if(Float.parseFloat(lengthET.getText().toString()) % (STUDDISTANCE/12.0) != 0
-                                && units.getSelectedItem().toString().equals("ft"))
-                            studs++;
+                //If the text is red, an invalid number was inputted
+                if(lengthTV.getCurrentTextColor() != Color.RED)
+                {
+                    length = Float.parseFloat(lengthET.getText().toString());
 
-                        if(units.getSelectedItem().toString().equals("in"))
-                            response += "The center of stud 1 should be 1.0 "
-                                    + units.getSelectedItem().toString() + ". along the base.\n";
-                        else if(units.getSelectedItem().toString().equals("ft"))
-                            response += "The center of stud 1 should be " + (1/12)
-                                    + units.getSelectedItem().toString() + ". along the base.\n";
-                        for(int i = 0; i < studs; i++)
+                    if(units.getSelectedItem().toString().equals("ft"))
+                        length = ftToIn(length);
+                    else if(units.getSelectedItem().toString().equals("cm"))
+                        length = cmToIn(length);
+                }
+                if(lengthTV.getCurrentTextColor() == Color.RED)
+                {
+                    studsTV.setText("ERROR: Invalid number.");
+                }
+                //Easter egg just for funsies
+                else if(length >= 535012204.7243)
+                {
+                    studsTV.setText("ERROR: There is literally nowhere on Earth with that " +
+                            "much land to build on.");
+                }
+                //Set an upper limit to how long the wall can be. This prevents the app from
+                //using all resources on your phone with really large numbers.
+                else if(length > 12000.0)
+                {
+                    studsTV.setText("ERROR: Length too large.");
+                }
+                //The number cannot be smaller than 2 inches because we are assuming the
+                //construction worker is using 2x4s
+                else if (length < 2.0)
+                {
+                    lengthTV.setTextColor(Color.RED);
+                    studsTV.setText("ERROR: Length too small.");
+                }
+                //If it is smaller than the width of two 2x4s, then we only want to use one.
+                else if(length < 4.0)
+                {
+                    studsTV.setText("The center of stud 1 should be "
+                            + String.format("%.2f",length/2) + " in. along the base.");
+                }
+                //Otherwise we will go through a loop to calculate and display every stud and its
+                //position on the base piece of wood.
+                else
+                {
+                    float currentPosition = 0;
+                    int studs = (int)(length / STUDDISTANCE);
+                    float excess = (int)(length % STUDDISTANCE);
+
+                    if(length % STUDDISTANCE != 0)
+                        studs++;
+
+                    String response = "The center of stud 1 should be 1.0 in. along the base.\n";
+
+                    for(int i = 0; i < studs; i++)
+                    {
+                        if(i == (studs - 1))
                         {
-                            if(i == (studs - 1) && units.getSelectedItem().toString().equals("in"))
-                            {
-                                response += "The center of stud " + (i+2) +  " should be "
-                                        + (Float.parseFloat(lengthET.getText().toString())-1)
-                                        + " " + units.getSelectedItem().toString()
-                                        + ". along the base.\n";
-                                break;
-                            }
-                            else if(i == (studs - 1) && units.getSelectedItem().toString().equals("ft"))
-                            {
-                                response += "The center of stud " + (i+2) +  " should be "
-                                        + (Float.parseFloat(lengthET.getText().toString())-(1/12))
-                                        + " " + units.getSelectedItem().toString()
-                                        + ". along the base.\n";
-                                break;
-                            }
-                            else if(Float.parseFloat(lengthET.getText().toString()) % STUDDISTANCE == 0
-                                    && units.getSelectedItem().toString().equals("in"))
-                                currentPosition += STUDDISTANCE;
-                            else if(Float.parseFloat(lengthET.getText().toString()) % (STUDDISTANCE/12.0) == 0
-                                    && units.getSelectedItem().toString().equals("ft"))
-                                currentPosition += (STUDDISTANCE/12.0);
-                            else if(i == 0 && units.getSelectedItem().toString().equals("in"))
-                                currentPosition = (excess + STUDDISTANCE)/2;
-                            else if(i == 0 && units.getSelectedItem().toString().equals("ft"))
-                                currentPosition = (float)(excess + (STUDDISTANCE/12.0))/2;
-                            else if(units.getSelectedItem().toString().equals("in"))
-                                currentPosition += STUDDISTANCE;
-                            else if(units.getSelectedItem().toString().equals("ft"))
-                                currentPosition += (float)(STUDDISTANCE/12.0);
-
-                            response += "The center of stud " + (i+2) +" should be " + currentPosition
-                                    + " " + units.getSelectedItem().toString() + ". along the base.\n";
+                            response += "The center of stud " + (i+2) +  " should be "
+                                    + String.format("%.2f",length-1) + " in. along the base.\n";
+                            break;
                         }
+                        else if(length % STUDDISTANCE == 0)
+                            currentPosition += STUDDISTANCE;
+                        else if(i == 0)
+                            currentPosition = (excess + STUDDISTANCE)/2;
+                        else
+                            currentPosition += STUDDISTANCE;
 
-                        //Display the results
-                        studsTV.setText(response);
-
+                        response += "The center of stud " + (i+2) +" should be "
+                                + String.format("%.2f",currentPosition) + " in. along the base.\n";
                     }
+
+                    //Display the results
+                    studsTV.setText(response);
+
+                }
             }
         });
     }
+
+    //Conversion functions
+    float ftToIn(float length)
+    { return length * 12; }
+    float cmToIn(float length)
+    { return length * (float)(0.393701); }
 }

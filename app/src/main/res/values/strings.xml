@@ -3,5 +3,6 @@
     <string-array name="units">
         <item>in</item>
         <item>ft</item>
+        <item>cm</item>
     </string-array>
 </resources>
